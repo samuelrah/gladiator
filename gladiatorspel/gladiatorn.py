@@ -1,5 +1,19 @@
 #import keyboard
 helth = 150
+1 or "slag" = 25
+2 or "sparka" = 35
+3 or "special attack" = 75
+while True:
+    try:
+         helth = int(input()) or str(input())
+            if helth> 0 :
+                return
+            else:
+                print("")
+        except ValueError:
+            print("Ogiltigt värde,")
+
+
 
 
 print ("Du är en gladiator i rome och du ska förbereda dig för att slås mot en annan gladiator, du måste vinna den här fighten för att överleva och för att försäna din frihet.\n")
