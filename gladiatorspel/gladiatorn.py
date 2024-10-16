@@ -1,18 +1,15 @@
-#import keyboard
-helth = 150
-1 or "slag" = 25
-2 or "sparka" = 35
-3 or "special attack" = 75
-while True:
-    try:
-         helth = int(input()) or str(input())
-            if helth> 0 :
-                return
-            else:
-                print("")
-        except ValueError:
-            print("Ogiltigt värde,")
+import random
 
+### VARIABLES FOR HEALTH ###
+player_health = 150
+enemy_health = 150
+
+### VARIABLES FOR THE FIST ###
+player_fist_damage = 25
+enemys_fist_damage = 25
+# Hit chance is between 1 and 100 percent. 
+player_fist_hit_chance = 70
+enemys_fist_hit_chance = 70
 
 
 
@@ -20,18 +17,38 @@ print ("Du är en gladiator i rome och du ska förbereda dig för att slås mot 
 
 #print ("tryck på en tangent för att fortsätta.") 
 #m.read_event()
-
-print ("Det är din tur att attackera, du har tre val vill du 1- slå, 2- sparka, 3- special attack. skriv nummeret eller namnet av attacken.")
+print ("Det är din tur att attackera, du har ett val vill du 1- slå. skriv nummeret eller namnet av attacken.")
 spelarens_attack = input().lower()
 
+
+### SPELAREN ATTACKERAR ###
 if (spelarens_attack == "1" or spelarens_attack == "slå"):
-    print ("Du gorde ett slag")
-
-elif (spelarens_attack == "2" or spelarens_attack == "sparka"):
-    print ("Du gorde en spark")
-
-elif (spelarens_attack == "3" or spelarens_attack == "special attack"):
-    print ("Du gorde en special attack")
+    print ("Du gjorde ett slag")
+    random_number = random.randint(1, 100)
 
 
+    if (random_number >= player_fist_hit_chance ):
+        print("du missade.")
+        
+    elif (random_number <= player_fist_hit_chance):
+        print("du träffade.")
+        enemy_health -= player_fist_damage
+        print(f"enemy has now {enemy_health} health.")
 
+### FIENDEN ATTACKERAR ###
+print ("Det är motstondarens tur att attackera")
+motstondarens_attack = input().lower
+
+if (motstondarens_attack == "1" or motstondarens_attack == "slå"):
+    print ("motstondaren gjorde ett slag")
+    random_number = random.randint(1, 100)
+
+    if (random_number >= enemys_fist_hit_chance ):
+        print("motstondaren missade.")
+        
+    elif (random_number <= enemys_fist_hit_chance):
+        print("motstondaren träffade.")
+        player_health -= enemys_fist_damage
+        print(f"player has now {player_health} health.")
+
+### SKRIV UT VEM SOM VANN ###
