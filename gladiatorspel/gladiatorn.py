@@ -26,13 +26,17 @@ player_shield_used = False
 enemy_shield_used = False
 
 os.system("cls")
+def intro():
+    print("Du är en gladiator i rome och du ska förbereda dig för att slås mot en annan gladiator,\n du måste vinna den här fighten för att överleva och för att försäkra din frihet.\n")
 
-print("Du är en gladiator i rome och du ska förbereda dig för att slås mot en annan gladiator, du måste vinna den här fighten för att överleva och för att försäkra din frihet.\n")
+def vilken_attack():
+    print("Det är din tur att attackera, du har tre val: 1- slå, 2- kick, 3- sköld. Skriv nummeret eller namnet av attacken.")
 
+
+intro ()
 ### GAME LOOP ###
 while player_health > 0 and enemy_health > 0:
-    print("Det är din tur att attackera, du har tre val: 1- slå, 2- kick, 3- sköld. Skriv nummeret eller namnet av attacken.")
-    
+    vilken_attack()
     ### SPELAREN ATTACKERAR ###
     spelarens_attack = input().lower()
     if (spelarens_attack == "1" or spelarens_attack == "slå"):
