@@ -5,15 +5,11 @@ import os
 player_health = 150
 enemy_health = 150
 
-### VARIABLES FOR THE FIST ###
+### VARIABLES FOR THE ATTACKS ###
 player_fist_damage = 25
 enemy_fist_damage = 25
-
-### VARIABLES FOR THE KICK ###
 player_kick_damage = 40
 enemy_kick_damage = 40
-
-### VARIABLES FOR SPECIAL ATTACK ###
 player_special_attack_damage = 60
 enemy_special_attack_damage = 60
 
@@ -21,7 +17,7 @@ enemy_special_attack_damage = 60
 player_turns = 0
 enemy_turns = 0
 
-# Hit chance is between 1 and 100 percent. 
+# Hit chances
 player_fist_hit_chance = 85
 enemy_fist_hit_chance = 85
 player_kick_hit_chance = 70
@@ -64,23 +60,29 @@ def validate_attack_input():
 def ask_use_shield():
     global player_shield_used
     global player_shield_count
+    
     valid = ["1", "2"]
     
     if player_shield_count > 0:
         while True:
             use_shield = input("Vill du använda din sköld? 1 för ja, 2 för nej: ")
-            if use_shield == "1" and not player_shield_used:
-                player_shield_used = True
-                player_shield_count -= 1
-                print(f"Du använder din sköld! Du har {player_shield_count} sköldar kvar.")
-                return              
+            if use_shield == "1":
+                if not player_shield_used:
+                    player_shield_used = True
+                    player_shield_count -= 1
+                    print(f"Du använder din sköld! Du har {player_shield_count} sköldar kvar.")
+                    return True
+                else:
+                    print("Du har redan använt din sköld.")
+                    return False
             elif use_shield == "2":
                 print("Du valde att inte använda din sköld.")
-                return
-            else:    
+                return False
+            else:
                 print("Ogiltig input! Vänligen välj 1 för ja eller 2 för nej.")
     else:
         print("Du har inga sköldar kvar att använda.")
+        return False
 
 intro()
 ### GAME LOOP ###
@@ -126,15 +128,15 @@ while player_health > 0 and enemy_health > 0:
 
     # Increment player's turn count
     player_turns += 1
-    if player_turns > 3 and spelarens_attack == 3:
-        player_turns = 0  # Reset turn counter after using special attack
+    if player_turns > 3 and spelarens_attack == "3":
+        player_turns = 0 # Reset turn counter after using special attack
     
     ### Ask to use shield before enemy attacks ###
     ask_use_shield()
 
-    ### FIENDEN ATTACKERAR ### 
+    ### FIENDEN ATTACKERAR ###
     print("Det är motståndarens tur att attackera")
-    motståndaren_attak = random.choice([1, 2, 3,])
+    motståndaren_attak = random.choice([1, 2, 3] if enemy_turns >= 3 else [1, 2])
     slump_tal = random.randint(1, 100)
 
     if (motståndaren_attak == 1):
@@ -146,7 +148,7 @@ while player_health > 0 and enemy_health > 0:
                 print(f"Du tar {enemy_fist_damage} i skada och du har {player_health} hälsopoäng kvar.")
             else:
                 print("Du blockerade attacken med din sköld!")
-                player_shield_used = False  # Reset shield status
+                player_shield_used = False
         else:
             print("och missar")
     
@@ -159,11 +161,11 @@ while player_health > 0 and enemy_health > 0:
                 print(f"Du tar {enemy_kick_damage} i skada och du har {player_health} hälsopoäng kvar.")
             else:
                 print("Du blockerade attacken med din sköld!")
-                player_shield_used = False  # Reset shield status
+                player_shield_used = False
         else:
             print("och missar")
     
-    elif (motståndaren_attak == 3 and player_turns == 3):
+    elif (motståndaren_attak == 3 and enemy_turns >= 3):
         print("Motståndaren använder sin special attack.")
         if (slump_tal <= enemy_special_attack_hit_chance):
             print("och träffar")
@@ -181,7 +183,10 @@ while player_health > 0 and enemy_health > 0:
                 print(f"Motståndaren har {enemy_shield_count} sköldar kvar.")
             else:
                 print("Motståndaren valde att inte använda sin sköld.")
-                
+  
+    # Increment enemy's turn counter after each attack
+    enemy_turns += 1
+
     if player_health < 0 and enemy_health < 0:
         break
 
