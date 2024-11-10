@@ -16,8 +16,10 @@ enemy_kick_damage = 40
 ### VARIABLES FOR SPECIAL ATTACK ###
 player_special_attack_damage = 60
 enemy_special_attack_damage = 60
-player_special_attack_used = False
-enemy_special_attack_used = False
+
+# Turn counters to track special attack usage
+player_turns = 0
+enemy_turns = 0
 
 # Hit chance is between 1 and 100 percent. 
 player_fist_hit_chance = 85
@@ -39,10 +41,19 @@ def intro():
     print("Du är en gladiator i rome och du ska förbereda dig för att slås mot en annan gladiator,\n du måste vinna den här fighten för att överleva och för att försäkra din frihet.\n")
 
 def vilken_attack():
-    print("Det är din tur att attackera, du har tre val: 1- slå, 2- kick, 3- special attack.\nSkriv nummeret eller namnet av attacken.")
-    print ("*OBS* du kan bara använda special attacken en gång.")
+    print("Det är din tur att attackera, Skriv numret eller namnet av attacken.")
+    print("\nDinna tillgängliga attacker:")
+    print("1 - Slå")
+    print("2 - Kick")
+    if player_turns >= 3:
+        print("3 - Special attack")
+
 def validate_attack_input():
-    valid_attacks = ["1", "slå", "2", "kick", "3", "special attack"]
+    valid_attacks = ["1", "slå", "2", "kick"]
+    if player_turns >= 3:
+        valid_attacks.append("3")
+        valid_attacks.append("special attack")
+    
     while True:
         spelarens_attack = input().lower()
         if spelarens_attack in valid_attacks:
@@ -53,19 +64,23 @@ def validate_attack_input():
 def ask_use_shield():
     global player_shield_used
     global player_shield_count
-
+    valid = ["1", "2"]
+    
     if player_shield_count > 0:
-        use_shield = input("Vill du använda din sköld? 1 för ja, 2 för nej: ")
-        if use_shield == "1" and not player_shield_used:
-            player_shield_used = True
-            player_shield_count -= 1
-            print(f"Du använder din sköld! Du har {player_shield_count} sköldar kvar.")
-        elif player_shield_used:
-            print("Du har redan använt din sköld!")
-        elif use_shield == "2":
-            print("Du valde att inte använda din sköld.")
+        while True:
+            use_shield = input("Vill du använda din sköld? 1 för ja, 2 för nej: ")
+            if use_shield == "1" and not player_shield_used:
+                player_shield_used = True
+                player_shield_count -= 1
+                print(f"Du använder din sköld! Du har {player_shield_count} sköldar kvar.")
+                return              
+            elif use_shield == "2":
+                print("Du valde att inte använda din sköld.")
+                return
+            else:    
+                print("Ogiltig input! Vänligen välj 1 för ja eller 2 för nej.")
     else:
-            print("Ogiltig input! Skölden förblev oanvänd.")
+        print("Du har inga sköldar kvar att använda.")
 
 intro()
 ### GAME LOOP ###
@@ -84,7 +99,7 @@ while player_health > 0 and enemy_health > 0:
             if not enemy_shield_used:
                 print("du träffade.")
                 enemy_health -= player_fist_damage
-                print(f"fienden har nu {enemy_health} hälsa.\n Det är motstondarens tur att attackera.")
+                print(f"fienden har nu {enemy_health} hälsa.\n Det är motståndaren tur att attackera.")
             else:
                 print("fienden blockerade din attack med sin sköld!")
                 enemy_shield_used = False  # Reset shield status
@@ -105,76 +120,73 @@ while player_health > 0 and enemy_health > 0:
                 enemy_shield_used = False  # Reset shield status
 
     elif (spelarens_attack == "3" or spelarens_attack == "special attack"):
-        if not player_special_attack_used:
-            print("Du använder din special attack!")
-            player_special_attack_used = True
-            random_number = random.randint(1, 100)
-            if (random_number <= player_special_attack_hit_chance):
-                enemy_health -= player_special_attack_damage
-                print(f"Du träffade med din special attack! Fienden har nu {enemy_health} hälsa.")
-            else:
-                print("Du missade din special attack!")
-        else:
-            print("Du har redan använt din special attack!")
+        print("Du använder din special attack!")
+        enemy_health -= player_special_attack_damage
+        print(f"Du träffade med din special attack! Fienden har nu {enemy_health} hälsa.")
 
+    # Increment player's turn count
+    player_turns += 1
+    if player_turns > 3 and spelarens_attack == 3:
+        player_turns = 0  # Reset turn counter after using special attack
+    
     ### Ask to use shield before enemy attacks ###
     ask_use_shield()
 
-    ### FIENDEN ATTACKERAR ###
-    print ("Det är motståndarens tur att attackera")
-    motståndaren_attak = random.choice([1, 2, 3])
+    ### FIENDEN ATTACKERAR ### 
+    print("Det är motståndarens tur att attackera")
+    motståndaren_attak = random.choice([1, 2, 3,])
     slump_tal = random.randint(1, 100)
 
     if (motståndaren_attak == 1):
-        print("motståndaren försöker slå dig.")
+        print("Motståndaren försöker slå dig.")
         if (slump_tal <= enemy_fist_hit_chance):
             if not player_shield_used:
                 print("och träffar")
                 player_health -= enemy_fist_damage
-                print(f"du tar {enemy_fist_damage} i skada och du har {player_health} hälsopoäng kvar.")
+                print(f"Du tar {enemy_fist_damage} i skada och du har {player_health} hälsopoäng kvar.")
             else:
                 print("Du blockerade attacken med din sköld!")
                 player_shield_used = False  # Reset shield status
         else:
             print("och missar")
+    
     elif (motståndaren_attak == 2):
-        print("motståndaren försöker sparka dig.")
+        print("Motståndaren försöker sparka dig.")
         if (slump_tal <= enemy_kick_hit_chance):
             if not player_shield_used:
                 print("och träffar")
                 player_health -= enemy_kick_damage
-                print(f"du tar {enemy_kick_damage} i skada och du har {player_health} hälsopoäng kvar.")
+                print(f"Du tar {enemy_kick_damage} i skada och du har {player_health} hälsopoäng kvar.")
             else:
                 print("Du blockerade attacken med din sköld!")
                 player_shield_used = False  # Reset shield status
         else:
             print("och missar")
-    elif (motståndaren_attak == 3):
-        if enemy_shield_count > 0 and not enemy_shield_used:
-            print("Motståndaren använder sin sköld!")
-            enemy_shield_used = True
-            enemy_shield_count -= 1
-            print(f"Motståndaren har {enemy_shield_count} sköldar kvar.")
+    
+    elif (motståndaren_attak == 3 and player_turns == 3):
+        print("Motståndaren använder sin special attack.")
+        if (slump_tal <= enemy_special_attack_hit_chance):
+            print("och träffar")
+            player_health -= enemy_special_attack_damage
+            print(f"Du tar {enemy_special_attack_damage} i skada och du har {player_health} hälsopoäng kvar.")
         else:
-            if enemy_shield_used:
-                print("Motståndaren har redan använt sin sköld!")
-            else:
-                print("Motståndaren har inga sköldar kvar!")
+            print("och missar sin special attack!")
 
-    ### Enemy Special Attack Logic ###
-    if not enemy_special_attack_used and enemy_health > 0:
-        if random.choice([True, False]):  # Randomly decide if the enemy uses special attack
-            print("Motståndaren använder en special attack!")
-            enemy_special_attack_used = True
-            random_number = random.randint(1, 100)
-            if (random_number <= enemy_special_attack_hit_chance):
-                player_health -= enemy_special_attack_damage
-                print(f"Motståndaren träffade med sin special attack! Du har nu {player_health} hälsa.")
+        # Enemy uses shield with a 50% chance
+        if enemy_shield_count > 0 and not enemy_shield_used:
+            if random.random() < 0.5:  # 50% chance to use shield
+                print("Motståndaren använder sin sköld!")
+                enemy_shield_used = True
+                enemy_shield_count -= 1
+                print(f"Motståndaren har {enemy_shield_count} sköldar kvar.")
             else:
-                print("Motståndaren missade sin special attack!")
+                print("Motståndaren valde att inte använda sin sköld.")
+                
+    if player_health < 0 and enemy_health < 0:
+        break
 
 # Output the result of the game after the loop ends
 if player_health <= 0:
-    print("motståndaren vann.")
+    print("\nMotståndaren vann.")
 elif enemy_health <= 0:
-    print("DU VANN. du besegrade din botståndare och du är fri.")
+    print("\nDU VANN. du besegrade din motståndare och du är fri.")
